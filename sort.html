@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>snapwiz test</title>
+    <style>
+
+        #input{
+            margin-bottom:2em;
+        }
+
+        #search{
+            width:1.5em;
+            height:1.5em;
+            margin-left:-5px;
+        }
+
+        #head{
+            clear: both;
+            padding-bottom:0;
+        }
+
+        #content{
+            float:right;
+            width:85%;
+
+        }
+        #summary{
+            width:50%;
+        }
+        #parentimage{
+            float:left;
+            width:10%;
+        }
+
+        #title{
+            font-size: larger;
+        }
+
+        #poster{
+            width:12em;
+            height:15em;
+        }
+    </style>
+    <script src="jquery-1.11.3.js"></script>
+</head>
+<body>
+
+<input type="text" id="input" name="director" style="width:20em">
+<img src="download.png" id="search">
+<div id="error"></div>
+
+<div id="check"></div>
+<script>
+    $(document).ready(function(){
+        $("#search").click(function(){
+            event.preventDefault();
+            var director=document.getElementById("input").value;
+            console.log(director);
+
+            $.ajax({
+                url:"http://netflixroulette.net/api/api.php?director=Quentin",
+
+                error:function(){
+                    $("#error").text("please check the link")
+                },
+
+                success:function(data) {
+                    console.log(data);
+                    console.log(data.length);
+                    var array = [];
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].director == director) {
+                            array.push(i);
+                        }
+                    }
+                    console.log(array.length);
+                    console.log(array);
+                    for (var j = 0; j < array.length - 1; j++) {
+                        for (var k = j + 1; k < array.length; k++) {
+                            var one = parseFloat(data[array[j]].rating);
+                            var two = parseFloat(data[array[k]].rating);
+
+                            if (two > one) {
+                                var x = array[j];
+                                var y = array[k];
+                                array[j] = y;
+                                array[k] = x;
+                            }
+                            else if(two==one){
+                                var firstword=data[array[j]].show_title;
+                                var secondword=data[array[k]].show_title;
+                                if(firstword.length>secondword.length){
+                                    for(var i=0;i<secondword.length;i++){
+                                        var firstwordvalue=firstword[i].charCodeAt(0);
+                                        var secondwordvalue=secondword[i].charCodeAt(0);
+                                        if(secondwordvalue>firstwordvalue){
+                                            var x = array[j];
+                                            var y = array[k];
+                                            array[j] = y;
+                                            array[k] = x;
+                                            return;
+                                        }
+                                    }
+                                    var x = array[j];
+                                    var y = array[k];
+                                    array[j] = y;
+                                    array[k] = x;
+
+                                }
+
+                            }
+
+                        }
+                    }
+                    console.log(array);
+                },
+                type:"GET"
+            })
+
+        })
+    })
+</script>
+
+</body>
+</html>

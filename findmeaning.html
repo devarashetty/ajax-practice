@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script  src="jquery-1.11.3.js"></script>
+    <style>
+        body{
+            margin:0;
+             margin-top:2em;
+        }
+        #box{
+            border:1px solid gainsboro;
+           margin-bottom: 0;
+            margin-top:10%;
+            margin-left:30%;
+            padding:2em;
+        }
+
+        #title{
+            padding-bottom:1em ;
+            margin-left:4em;
+        }
+
+        ul{
+            list-style-type: none;
+        }
+
+        #emptybox{
+              height:2em;
+            padding-right:2em ;
+            marign-right:1em;
+        }
+
+        #submitbutton{
+            margin-left:2em;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="box">
+   <div id="title"><h3>Local Dictionary</h3></div>
+    <form>
+        <input id="emptybox" type="text" value="" name="word" placeholder="enter the word">
+        <input id="submitbutton" type="submit" value="submit" name="submit">
+    </form>
+</div>
+
+<ul id="type">
+</ul>
+<script>
+
+   x= $("input").width();
+
+   $("#box").css("width",x+x).css("background-color","gainsboro");
+
+  $(document).ready(function() {
+      $("#submitbutton").click(function (event) {
+          event.preventDefault();
+          word = document.getElementById("emptybox").value;
+          console.log(word);
+           url1="http://dictionary.reference.com/browse/"+word;
+          console.log(url1);
+
+          $.ajax({
+              url:url1,
+
+              error:function(){
+                  $("#meaning").text("");
+                  alert("word does't exist");
+              },
+
+              success:function(data){
+                  console.log(data.length);
+                  var exp=/<section class="def-pbk ce.*?>(.|\n)*?<\/section>/g;
+                  var d=data.match(exp);
+
+                  console.log(typeof(d));
+                  console.log(d.length);
+               for(var i=0;i< d.length;i++){
+                   console.log(d[i]);
+                  var meannum=/"def-set">(.|\n)*?<\/div/g;
+                   var e=d[i].match(meannum);
+                   console.log(e);
+
+                   var wordtypeexp=/"dbox-pg.*?</g;
+                   var wordtype=d[i].match(wordtypeexp);
+                   var wordtypeeditexp=/"dbox-pg">|</g;
+                   for(var k=0;k<wordtype.length;k++){
+                       var wordtypeedit=wordtype[k].replace(wordtypeeditexp,"");
+                   }
+                    console.log(wordtypeedit);
+                   var words=[];
+                   var wordsedit=[]
+                   var wordsexp=/<(.|\n)*?>/g;
+                   var wordseditexp=/"def-set">|<\/div/g;
+
+                   for(var j=0;j< e.length;j++){
+
+                       words[j]=e[j].replace(wordsexp,"");
+                   }
+                   for(var j=0;j< e.length;j++){
+
+                       wordsedit[j]=words[j].replace(wordseditexp,"");
+                   }
+
+                   for(j=0;j<words.length;j++){
+                       console.log(wordsedit[j]);
+                   }
+
+                    var node1=document.createElement("div");
+                    node1.setAttribute("id","i");
+                   var node = document.createElement("li");
+                   var textnode = document.createTextNode(wordtypeedit);         // Create a text node
+                   node.appendChild(textnode);// Append the text to <li>
+                   document.getElementById("type").appendChild(node);
+
+                   for(j=0;j<words.length;j++){
+                       var node = document.createElement("LI");                 // Create a <li> node
+                       var textnode = document.createTextNode(wordsedit[j]);         // Create a text node
+                       node.appendChild(textnode);                              // Append the text to <li>
+                       node1.appendChild(node);
+                   }
+                   document.getElementById("type").appendChild(node1);
+               }
+
+              },
+
+              type:'GET'
+          })
+      })
+  });
+
+</script>
+
+</body>
+</html>
